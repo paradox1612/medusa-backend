@@ -91,13 +91,14 @@ const plugins = [
 
  //medusa email
  {
-  resolve: "medusa-plugin-sendgrid",
-  options:{
-	api_key: process.env.SENDGRID_API_KEY,
-	from: "customer@hastkari.com",
-	order_placed_template: "d-3f887d7afb624a7984e84bd26a8d58a0",
-	}
- },
+  resolve: `medusa-plugin-sendgrid`,
+  options: {
+    api_key: process.env.SENDGRID_API_KEY,
+    from: "customer@hastkari.com",
+    order_placed_template: "d-3f887d7afb624a7984e84bd26a8d58a0",
+    
+  },
+},
 
 ];
 
