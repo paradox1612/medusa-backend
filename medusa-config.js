@@ -131,12 +131,7 @@ const projectConfig = {
 /** @type {import('@medusajs/medusa').ConfigModule} */
 module.exports = {
   projectConfig,
+  modules,
   plugins,
-  modules:{
-cacheService: {
-      resolve: "@medusajs/cache-redis",
-      options: { 
-        redisUrl: REDIS_URL,
-        ttl: 30,},},
-},
+  
 };
