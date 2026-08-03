@@ -46,7 +46,9 @@ const plugins = [
     resolve: "@medusajs/admin",
     /** @type {import('@medusajs/admin').PluginOptions} */
     options: {
-      autoRebuild: true,
+      // Containers ship a prebuilt admin UI: rebuilding at boot fails in-image
+      // (webpack/css-loader) and takes the whole server down. Dev default unchanged.
+      autoRebuild: process.env.ADMIN_AUTO_REBUILD !== "false",
       serve: true,
       path: "/app",
       develop: {
