@@ -19,9 +19,10 @@ ENV NPM_CONFIG_FETCH_RETRIES=5 \
     NPM_CONFIG_FETCH_RETRY_MINTIMEOUT=2000 \
     NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT=30000 \
     NPM_CONFIG_MAXSOCKETS=4
-COPY package.json ./
-# medusa v1's peer graph needs the legacy resolver on npm 10
-RUN npm install --legacy-peer-deps
+COPY package.json npm-shrinkwrap.json ./
+# npm ci against the shrinkwrap = the exact 2203-package tree running in
+# production (recovered from ct-1's working dir — it was never committed)
+RUN npm ci --legacy-peer-deps
 COPY . .
 # server (tsc) + admin UI; admin build is the memory hog
 ENV NODE_OPTIONS=--max-old-space-size=4096
