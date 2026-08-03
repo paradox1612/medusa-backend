@@ -13,6 +13,12 @@
 
 FROM node:20.15.1-bookworm AS build
 WORKDIR /app
+# no lockfile exists upstream — hundreds of metadata fetches from shared CI
+# runner IPs trip npmjs 429s; retry + throttle instead of failing the build
+ENV NPM_CONFIG_FETCH_RETRIES=5 \
+    NPM_CONFIG_FETCH_RETRY_MINTIMEOUT=2000 \
+    NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT=30000 \
+    NPM_CONFIG_MAXSOCKETS=4
 COPY package.json ./
 # medusa v1's peer graph needs the legacy resolver on npm 10
 RUN npm install --legacy-peer-deps
