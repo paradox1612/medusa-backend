@@ -30,8 +30,13 @@ RUN npm run build:server && npm run build:admin
 
 FROM node:20.15.1-bookworm-slim
 WORKDIR /app
-ENV NODE_ENV=production \
-    MEDUSA_EVENT_BUS_TYPE=redis
+# NODE_ENV is deliberately NOT set to production: ct-1 doesn't set it either,
+# and Medusa's express-session marks the admin cookie Secure-only under
+# NODE_ENV=production. Behind Cloudflare that would be fine, but any direct
+# HTTP access (port-forward, in-cluster probe, debugging) silently gets a 200
+# from POST /admin/auth with no Set-Cookie, then 401 on every follow-up —
+# an authentication failure that looks like a wrong password. Match production.
+ENV MEDUSA_EVENT_BUS_TYPE=redis
 COPY --from=build /app /app
 # runtime uploads mountpoint (PVC in k8s)
 RUN mkdir -p /app/uploads
