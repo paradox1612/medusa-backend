@@ -40,7 +40,8 @@ jobs:
           GITOPS_TOKEN: ${{ secrets.GITOPS_TOKEN }}
         run: |
           set -euo pipefail
-          git clone --depth=1 "https://x-access-token:${GITOPS_TOKEN}@github.com/paradox1612/homelab-gitops.git" gitops
+          TOKEN="$(printf '%s' "$GITOPS_TOKEN" | tr -d '[:space:]')"
+          git clone --depth=1 "https://x-access-token:${TOKEN}@github.com/paradox1612/homelab-gitops.git" gitops
           cd gitops
           sed -i "s#ghcr.io/paradox1612/medusa-backend:[^\"'[:space:]]*#ghcr.io/paradox1612/medusa-backend:sha-${{ github.sha }}#g" apps/medusa/backend.yaml
           git config user.name "medusa-backend[bot]"
