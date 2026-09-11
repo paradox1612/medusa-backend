@@ -30,3 +30,22 @@ jobs:
             ghcr.io/paradox1612/medusa-backend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update image tag in homelab-gitops (Argo deploys)
+        env:
+          GITOPS_TOKEN: ${{ secrets.GITOPS_TOKEN }}
+        run: |
+          set -euo pipefail
+          git clone --depth=1 "https://x-access-token:${GITOPS_TOKEN}@github.com/paradox1612/homelab-gitops.git" gitops
+          cd gitops
+          sed -i "s#ghcr.io/paradox1612/medusa-backend:[^\"'[:space:]]*#ghcr.io/paradox1612/medusa-backend:sha-${{ github.sha }}#g" apps/medusa/backend.yaml
+          git config user.name "medusa-backend[bot]"
+          git config user.email "ci@thekush.dev"
+          git add apps/medusa/backend.yaml
+          if git diff --cached --quiet; then echo "no manifest change"; exit 0; fi
+          git commit -m "deploy(medusa-backend): sha-${{ github.sha }}"
+          for i in 1 2 3 4 5; do git push && break || { git pull --rebase --autostash; sleep $((RANDOM % 6 + 2)); }; done
